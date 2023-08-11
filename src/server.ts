@@ -12,7 +12,7 @@ app.use(express.json());
 dotenv.config();
 
 route.get("/", (req: Request, res: Response) => {
-  res.json({ message: "hello world with Typescript" });
+  res.status(200).json({ message: "hello world with Typescript" });
 });
 
 app.use(route);
