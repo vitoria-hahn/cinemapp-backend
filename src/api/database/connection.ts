@@ -4,19 +4,19 @@ import { Pool } from "pg";
 //dotenv.config();
 
 const connectDb = async () => {
-  const client = new Pool({
+  const pool = new Pool({
     user: "vitoria",
     host: "localhost",
     database: "cinemapp",
-    password: "Casa0049",
+    password: "password",
     port: 5432,
   });
 
-  client.connect(() => {
+  pool.connect(() => {
     console.log("Connected!");
   });
 
-  return { client };
+  return pool;
 };
 
 export { connectDb };

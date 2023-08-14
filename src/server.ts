@@ -2,6 +2,9 @@ import express from "express";
 import dotenv from "dotenv";
 
 import { Router, Request, Response } from "express";
+import { connectDb } from "./api/database/connection";
+
+import "./api/database/runMigrations";
 
 const app = express();
 
@@ -11,8 +14,9 @@ app.use(express.json());
 
 dotenv.config();
 
-route.get("/", (req: Request, res: Response) => {
-  res.status(200).json({ message: "hello world with Typescript" });
+route.get("/", async (req: Request, res: Response) => {
+  res.json({ message: "hello world with Typescript" });
+  await connectDb();
 });
 
 app.use(route);

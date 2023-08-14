@@ -3,8 +3,8 @@ import path from "path";
 
 import { connectDb } from "./connection";
 
-await (async () => {
-  const { client } = await connectDb();
+async () => {
+  const pool = await connectDb();
 
   const fileDatabaseDir = path.join(__dirname, "migrations");
 
@@ -17,9 +17,9 @@ await (async () => {
 
         const runMigrationQuery = content.toString();
 
-        await client.query(runMigrationQuery);
+        await pool.query(runMigrationQuery);
         console.log(content.toString);
       });
     });
   });
-})();
+};
