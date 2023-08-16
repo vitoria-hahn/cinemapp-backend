@@ -35,6 +35,12 @@ class MoviesPostgresRepository implements MoviesRepository {
 
     return response.rows;
   }
+
+  async delete(id: Movie["id"]): Promise<void> {
+    await this.client.query(
+      "DELETE FROM MOVIES WHERE MOVIES.id = $1;", [id]
+    );
+  }
 }
 
 export { MoviesPostgresRepository };
