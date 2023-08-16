@@ -5,6 +5,8 @@ interface MoviesRepository {
 
   getAll(): Promise<Movie[]>;
 
+  getById(id: string): Promise<Movie>;
+
   delete(id: string): Promise<void>;
 }
 
