@@ -1,5 +1,5 @@
 import express from "express";
-import { router } from "./routes/CreateMovieRouter";
+import { router } from "./Router";
 import { connection } from "./api/database/connection";
 
 import "./api/database/runMigrations";

@@ -27,6 +27,14 @@ class MoviesPostgresRepository implements MoviesRepository {
       ],
     );
   }
+
+  async getAll(): Promise<Movie[]> {
+    const response = await this.client.query(
+      "SELECT * FROM MOVIES;"
+    );
+
+    return response.rows;
+  }
 }
 
 export { MoviesPostgresRepository };
