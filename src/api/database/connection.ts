@@ -1,22 +1,39 @@
-import { Pool } from "pg";
-//import dotenv from "dotenv";
+import { Client } from "pg";
+import dotenv from "dotenv";
 
-//dotenv.config();
+dotenv.config();
+const connection = new Client({
+  user: "vitoria",
+  host: "localhost",
+  database: "cinemapp",
+  password: "password",
+  port: 5432,
+});
 
-const connectDb = async () => {
-  const pool = new Pool({
-    user: "vitoria",
-    host: "localhost",
-    database: "cinemapp",
-    password: "password",
-    port: 5432,
-  });
+let isConnected = false;
 
-  pool.connect(() => {
+connection.connect()
+  .then(() => {
+    isConnected = true;
     console.log("Connected!");
+  })
+  .catch(error => {
+    console.error("Error connecting to the database:", error.message);
   });
 
-  return pool;
+const connectDb = async (): Promise<Client> => {
+  if (!isConnected) {
+    console.log("Connecting to the database...");
+    try {
+      await connection.connect();
+      isConnected = true;
+      console.log("New Connection Started!");
+    } catch (error) {
+      console.error("Error connecting to the database:", error);
+    }
+  }
+
+  return connection;
 };
 
-export { connectDb };
+export { connection };

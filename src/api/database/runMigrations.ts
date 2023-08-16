@@ -1,25 +1,34 @@
 import fs from "fs";
 import path from "path";
 
-import { connectDb } from "./connection";
+import { connection } from "./connection";
 
-async () => {
-  const pool = await connectDb();
+(async () => {
+  const client = connection;
 
   const fileDatabaseDir = path.join(__dirname, "migrations");
 
   fs.readdir(fileDatabaseDir, (error, files) => {
-    files.forEach((file) => {
-      fs.readFile(path.join(fileDatabaseDir, file), async (error, content) => {
-        if (error) {
-          console.error(error);
-        }
+    if (error) {
+      console.error(error);
+    } else {
+      console.log("Started Migrations");
 
-        const runMigrationQuery = content.toString();
+      files.forEach((file) => {
+        fs.readFile(
+          path.join(fileDatabaseDir, file),
+          async (error, content) => {
+            if (error) {
+              console.error(error);
+            }
 
-        await pool.query(runMigrationQuery);
-        console.log(content.toString);
+            const runMigrationQuery = content.toString();
+
+            await client.query(runMigrationQuery);
+            console.log("Ended Migrations");
+          },
+        );
       });
-    });
+    }
   });
-};
+})();

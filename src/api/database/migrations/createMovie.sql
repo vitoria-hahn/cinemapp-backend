@@ -1,10 +1,1 @@
-CREATE TABLE IF NOT EXISTS movie(
-    ID UUID PRIMARY KEY,
-    Title VARCHAR(),
-    Year VARCHAR(),
-    Genre VARCHAR(),
-    Director VARCHAR(),
-    Minutes VARCHAR(),
-    ImdbScore VARCHAR(),
-    Summary TEXT()
-);
+CREATE TABLE IF NOT EXISTS movies(id UUID PRIMARY KEY, title VARCHAR NOT NULL, year VARCHAR NOT NULL, genre VARCHAR NOT NULL, director VARCHAR NOT NULL, minutes VARCHAR NOT NULL, imdbScore VARCHAR NOT NULL, summary VARCHAR NOT NULL);
