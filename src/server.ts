@@ -1,20 +1,20 @@
 import express from "express";
-import dotenv from "dotenv";
+import { router } from "./routes/CreateMovieRouter";
+import { connection } from "./api/database/connection";
 
-import { Router, Request, Response } from "express";
+import "./api/database/runMigrations";
 
 const app = express();
 
-const route = Router();
-
 app.use(express.json());
 
-dotenv.config();
+app.use(router);
 
-route.get("/", (req: Request, res: Response) => {
-  res.json({ message: "hello world with Typescript" });
+app.listen(8888, () => "server running on port 8888");
+
+process.on('SIGINT', function () {
+    if (connection) {
+        connection.end();
+        console.log("Database connection closed!");
+    }
 });
-
-app.use(route);
-
-app.listen(3333, () => "server running on port 3333");
