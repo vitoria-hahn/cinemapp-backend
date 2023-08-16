@@ -2,7 +2,7 @@ import { Movie } from "../models/Movie";
 import { MoviesRepository } from "./MoviesRepository";
 
 import { connection } from "../database/connection";
-import { Client, Connection } from "pg";
+import { Client } from "pg";
 
 class MoviesPostgresRepository implements MoviesRepository {
   private client: Client;
@@ -36,7 +36,16 @@ class MoviesPostgresRepository implements MoviesRepository {
     return response.rows;
   }
 
-  async delete(id: Movie["id"]): Promise<void> {
+  async getById(id: string): Promise<Movie> {
+    const response = await this.client.query(
+      "SELECT * FROM MOVIES WHERE MOVIES.id = $1;", [id]
+    );
+
+    console.log(response);
+    return response.rows[0];
+  }
+
+  async delete(id: string): Promise<void> {
     await this.client.query(
       "DELETE FROM MOVIES WHERE MOVIES.id = $1;", [id]
     );
