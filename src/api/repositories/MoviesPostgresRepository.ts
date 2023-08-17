@@ -28,10 +28,17 @@ class MoviesPostgresRepository implements MoviesRepository {
     );
   }
 
-  async getAll(): Promise<Movie[]> {
+  async getById(id: string): Promise<Movie> {
     const response = await this.client.query(
-      "SELECT * FROM MOVIES;"
+      "SELECT * FROM MOVIES WHERE MOVIES.id = $1;", [id]
     );
+
+    console.log(response);
+    return response.rows[0];
+  }
+
+  async getAll(startIndex: number, endIndex: number): Promise<Movie[]> {
+    const response = await this.client.query("SELECT * FROM MOVIES LIMIT $1 OFFSET $2", [endIndex, startIndex]);
 
     return response.rows;
   }

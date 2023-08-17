@@ -3,7 +3,9 @@ import { Movie } from "../models/Movie";
 interface MoviesRepository {
   create(movie: Movie): Promise<void>;
 
-  getAll(): Promise<Movie[]>;
+  getById(id: string): Promise<Movie>;
+
+  getAll(startIndex: number, endIndex: number): Promise<Movie[]>;
 
   delete(id: string): Promise<void>;
 }
