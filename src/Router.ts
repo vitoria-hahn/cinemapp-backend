@@ -1,31 +1,30 @@
-import { Router, request } from "express";
+import { Router, Request, Response } from "express";
 import { CreateMovieController } from "./api/controllers/CreateMovieController";
 import { MoviesPostgresRepository } from "./api/repositories/MoviesPostgresRepository";
-import { CreateMovieService } from "./api/services/CreateMovieService";
-import { GetAllMoviesService } from "./api/services/GetAllMoviesService";
 import { GetAllMoviesController } from "./api/controllers/GetAllMoviesController";
-import { DeleteMovieService } from "./api/services/DeleteMovieService";
 import { DeleteMovieController } from "./api/controllers/DeleteMovieController";
+import { MovieService } from "./api/services/MovieService";
+import { GetMovieByIdController } from "./api/controllers/GetMovieByIdController";
 
 const moviesRepository = new MoviesPostgresRepository();
+const movieService = new MovieService(moviesRepository);
 
-const createMovieService = new CreateMovieService(moviesRepository);
-const createMovieController = new CreateMovieController(createMovieService);
+const createMovieController = new CreateMovieController(movieService);
 
-const getAllMoviesService = new GetAllMoviesService(moviesRepository);
-const getAllMoviesController = new GetAllMoviesController(getAllMoviesService);
+const getAllMoviesController = new GetAllMoviesController(movieService);
 
-const deleteMovieService = new DeleteMovieService(moviesRepository);
-const deleteMovieController = new DeleteMovieController(deleteMovieService);
+const deleteMovieController = new DeleteMovieController(movieService);
+
+const getMoMovieByIdController = new GetMovieByIdController(movieService);
 
 const router = Router();
 
-router.post("/movies", (request, response) => {
+router.post("/movies", (request: Request, response: Response) => {
   return createMovieController.handle(request, response);
 });
 
-router.get("/movies", (_request, response) => {
-  return getAllMoviesController.handle(response);
+router.get("/movies", (request: Request, response: Response) => {
+  return getAllMoviesController.handle(request, response);
 });
 
 router.delete("/movies/:id", (request, response) => {
