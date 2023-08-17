@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
-import { CreateMovieService } from "../services/CreateMovieService";
+import { MovieService } from "../services/MovieService";
 
 class CreateMovieController {
-  constructor(private createMovieService: CreateMovieService) { }
+  constructor(private movieService: MovieService) { }
   async handle(request: Request, response: Response) {
     const { title, year, genre, director, minutes, imdbScore, summary } =
       request.body;
 
-    await this.createMovieService.create({
+    await this.movieService.create({
       title,
       year,
       genre,
