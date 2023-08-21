@@ -41,11 +41,19 @@ class MoviesPostgresRepository implements MoviesRepository {
     return response.rows[0];
   }
 
-  async getAll(startIndex: number, endIndex: number): Promise<GetAllResponse> {
-    const response1 = this.client.query("SELECT * FROM MOVIES LIMIT $1 OFFSET $2;", [endIndex, startIndex]);
-    const response2 = this.client.query("SELECT COUNT(*) FROM MOVIES;");
+  async getAll(startIndex: number, endIndex: number, column?: string, value?: string): Promise<GetAllResponse> {
+    let responseSelect;
+    let responseCount;
 
-    const promises = [response1, response2];
+    if (column && value) {
+      responseSelect = this.client.query("SELECT * FROM MOVIES WHERE $1 = ANY(MOVIES." + column + ") LIMIT $2 OFFSET $3;", [value, endIndex, startIndex]);
+      responseCount = this.client.query("SELECT COUNT(*) FROM MOVIES WHERE $1 = ANY(MOVIES." + column + ");", [value]);
+    } else {
+      responseSelect = this.client.query("SELECT * FROM MOVIES LIMIT $1 OFFSET $2;", [endIndex, startIndex]);
+      responseCount = this.client.query("SELECT COUNT(*) FROM MOVIES;");
+    }
+
+    const promises = [responseSelect, responseCount];
 
     const response = await Promise.all(promises);
 
