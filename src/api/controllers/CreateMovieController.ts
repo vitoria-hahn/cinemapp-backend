@@ -7,7 +7,7 @@ class CreateMovieController {
     const { title, year, genre, director, minutes, imdbScore, summary } =
       request.body;
 
-    await this.movieService.create({
+    const result = await this.movieService.create({
       title,
       year,
       genre,
@@ -17,7 +17,7 @@ class CreateMovieController {
       summary,
     });
 
-    return response.send();
+    return response.sendStatus(result);
   }
 }
 

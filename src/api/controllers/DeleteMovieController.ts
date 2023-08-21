@@ -6,7 +6,7 @@ class DeleteMovieController {
     async handle(request: Request, response: Response) {
         const result = await this.movieService.delete(request.params.id);
 
-        return response.send(result);
+        return response.sendStatus(result);
     }
 }
 

@@ -2,13 +2,13 @@ import { PaginationResponse, pagination } from "../controllers/utils/Pagination"
 import { Movie } from "../models/Movie";
 import { GetAllResponse } from "../repositories/MoviesPostgresRepository";
 import { MoviesRepository } from "../repositories/MoviesRepository";
-import { Response, Request } from "express";
+import { Request } from "express";
 
 
 interface CreateMovieDTO {
     title: string;
-    year: string;
-    genre: string;
+    year: number;
+    genre: string[];
     director: string;
     minutes: number;
     imdbScore: number;
@@ -30,8 +30,8 @@ export class MovieService {
         const paginatedMovies: GetAllResponse = await this.moviesRepository.getAll(paginationResult.startIndex, paginationResult.endIndex);
 
         const paginatedMovieResponse = {
-            page: parseInt(request.query.page as string),
-            limit: parseInt(request.query.limit as string),
+            page: paginationResult.page,
+            limit: paginationResult.limit,
             movies: paginatedMovies,
         };
 
@@ -53,21 +53,27 @@ export class MovieService {
         minutes,
         imdbScore,
         summary,
-    }: CreateMovieDTO) {
+    }: CreateMovieDTO): Promise<number> {
         let movie = new Movie();
 
-        movie = Object.assign({
-            ...movie,
-            title,
-            year,
-            genre,
-            director,
-            minutes,
-            imdbScore,
-            summary,
-        });
+        if (year < 2100 && year > 0 && minutes > 0 && minutes < 1000 && imdbScore <= 10 && imdbScore >= 0) {
+            movie = Object.assign({
+                ...movie,
+                title,
+                year,
+                genre,
+                director,
+                minutes,
+                imdbScore,
+                summary,
+            });
 
-        await this.moviesRepository.create(movie);
+            await this.moviesRepository.create(movie);
+
+            return 200;
+        } else {
+            return 500;
+        }
     }
 
     async delete(id: string): Promise<number> {
