@@ -17,7 +17,7 @@ class MoviesPostgresRepository implements MoviesRepository {
   }
 
   async create(movie: Movie): Promise<void> {
-    await this.client.query(
+    const response = await this.client.query(
       "INSERT INTO MOVIES(ID, TITLE, YEAR, GENRE, DIRECTOR, MINUTES, IMDBSCORE, SUMMARY) \
         VALUES($1, $2, $3, $4, $5, $6, $7, $8);",
       [

@@ -3,14 +3,15 @@ import { Request } from "express";
 export interface PaginationResponse {
     startIndex: number;
     endIndex: number;
+    page: number;
+    limit: number;
 }
 
 export function pagination(request: Request): PaginationResponse {
     let page: number;
     let limit: number;
 
-    if (request?.query.page && request.query.limit) {
-
+    if (validRequest(request)) {
         page = parseInt(request.query.page as string);
         limit = parseInt(request.query.limit as string);
     } else {
@@ -24,8 +25,19 @@ export function pagination(request: Request): PaginationResponse {
 
     const paginationResponse = {
         startIndex,
-        endIndex
+        endIndex,
+        page,
+        limit
     }
 
     return paginationResponse;
+}
+
+function validRequest(request: Request): Boolean {
+    if (request.query.page && parseInt(request.query.page as string) >= 1) {
+        if (request.query.limit && parseInt(request.query.limit as string) >= 1 && parseInt(request.query.limit as string) <= 100) {
+            return true;
+        }
+    }
+    return false;
 }
