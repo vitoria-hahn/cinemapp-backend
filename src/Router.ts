@@ -17,9 +17,6 @@ const deleteMovieController = new DeleteMovieController(movieService);
 
 const getMoMovieByIdController = new GetMovieByIdController(movieService);
 
-const getMovieByIdService = new GetMovieByIdService(moviesRepository);
-const getMoMovieByIdController = new GetMovieByIdController(getMovieByIdService);
-
 const router = Router();
 
 router.post("/movies", (request: Request, response: Response) => {
