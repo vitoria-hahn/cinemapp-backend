@@ -55,17 +55,15 @@ class MoviesPostgresRepository implements MoviesRepository {
     }
   }
 
-  async delete(id: Movie["id"]): Promise<void> {
+  async delete(id: Movie["id"]): Promise<number> {
 
     if (await this.getById(id)) {
       await this.client.query(
         "DELETE FROM MOVIES WHERE MOVIES.id = $1;", [id]
       );
-      return console.error("Movie Deleted.");
-
+      return 200;
     } else {
-      return console.error("This id does not exist.");
-
+      return 404;
     }
   }
 }

@@ -8,7 +8,7 @@ interface MoviesRepository {
 
   getAll(startIndex: number, endIndex: number): Promise<GetAllResponse>;
 
-  delete(id: string): Promise<void>;
+  delete(id: string): Promise<number>;
 }
 
 export { MoviesRepository };

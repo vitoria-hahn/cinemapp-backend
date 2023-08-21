@@ -70,7 +70,13 @@ export class MovieService {
         await this.moviesRepository.create(movie);
     }
 
-    async delete(id: string): Promise<void> {
-        await this.moviesRepository.delete(id);
+    async delete(id: string): Promise<number> {
+        const response = await this.moviesRepository.delete(id);
+
+        if (response == 200) {
+            return response;
+        }
+
+        return response;
     }
 }
