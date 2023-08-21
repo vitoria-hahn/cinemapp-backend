@@ -1,12 +1,12 @@
-import { GetAllMoviesService } from "../services/GetAllMoviesService";
-import { Response } from "express";
+import { MovieService, PaginatedMoviesResponse } from "../services/MovieService";
+import { Response, Request } from "express";
 
 class GetAllMoviesController {
-    constructor(private getAllMoviesService: GetAllMoviesService) { }
-    async handle(response: Response) {
-        const result = await this.getAllMoviesService.getAll();
+    constructor(private movieService: MovieService) { }
+    async handle(request: Request, response: Response): Promise<void> {
+        const paginatedMovies: PaginatedMoviesResponse = await this.movieService.getAll(request);
 
-        return response.send(result);
+        response.json(paginatedMovies);
     }
 }
 

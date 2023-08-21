@@ -1,13 +1,14 @@
 import { Movie } from "../models/Movie";
+import { GetAllResponse } from "./MoviesPostgresRepository";
 
 interface MoviesRepository {
   create(movie: Movie): Promise<void>;
 
-  getAll(): Promise<Movie[]>;
-
   getById(id: string): Promise<Movie>;
 
-  delete(id: string): Promise<void>;
+  getAll(startIndex: number, endIndex: number): Promise<GetAllResponse>;
+
+  delete(id: string): Promise<number>;
 }
 
 export { MoviesRepository };

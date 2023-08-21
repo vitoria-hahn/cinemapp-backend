@@ -1,10 +1,10 @@
-import { DeleteMovieService } from "../services/DeleteMovieService";
+import { MovieService } from "../services/MovieService";
 import { Request, Response } from "express";
 
 class DeleteMovieController {
-    constructor(private deleteMovieService: DeleteMovieService) { }
+    constructor(private movieService: MovieService) { }
     async handle(request: Request, response: Response) {
-        const result = await this.deleteMovieService.delete(request.params.id);
+        const result = await this.movieService.delete(request.params.id);
 
         return response.send(result);
     }
