@@ -27,6 +27,10 @@ router.get("/movies", (request: Request, response: Response) => {
   return getAllMoviesController.handle(request, response);
 });
 
+router.get("/movies/:id", (request, response) => {
+  return getMoMovieByIdController.handle(request, response);
+});
+
 router.delete("/movies/:id", (request, response) => {
   return deleteMovieController.handle(request, response);
 })

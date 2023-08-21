@@ -2,7 +2,12 @@ import { Movie } from "../models/Movie";
 import { MoviesRepository } from "./MoviesRepository";
 
 import { connection } from "../database/connection";
-import { Client, Connection } from "pg";
+import { Client } from "pg";
+
+export interface GetAllResponse {
+  data: Movie[];
+  count: number;
+}
 
 class MoviesPostgresRepository implements MoviesRepository {
   private client: Client;
@@ -33,20 +38,35 @@ class MoviesPostgresRepository implements MoviesRepository {
       "SELECT * FROM MOVIES WHERE MOVIES.id = $1;", [id]
     );
 
-    console.log(response);
     return response.rows[0];
   }
 
-  async getAll(startIndex: number, endIndex: number): Promise<Movie[]> {
-    const response = await this.client.query("SELECT * FROM MOVIES LIMIT $1 OFFSET $2", [endIndex, startIndex]);
+  async getAll(startIndex: number, endIndex: number): Promise<GetAllResponse> {
+    const response1 = this.client.query("SELECT * FROM MOVIES LIMIT $1 OFFSET $2;", [endIndex, startIndex]);
+    const response2 = this.client.query("SELECT COUNT(*) FROM MOVIES;");
 
-    return response.rows;
+    const promises = [response1, response2];
+
+    const response = await Promise.all(promises);
+
+    return {
+      data: response[0].rows,
+      count: response[1].rows[0].count,
+    }
   }
 
   async delete(id: Movie["id"]): Promise<void> {
-    await this.client.query(
-      "DELETE FROM MOVIES WHERE MOVIES.id = $1;", [id]
-    );
+
+    if (await this.getById(id)) {
+      await this.client.query(
+        "DELETE FROM MOVIES WHERE MOVIES.id = $1;", [id]
+      );
+      return console.error("Movie Deleted.");
+
+    } else {
+      return console.error("This id does not exist.");
+
+    }
   }
 }
 

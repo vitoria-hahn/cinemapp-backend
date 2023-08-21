@@ -1,8 +1,6 @@
 import { Request } from "express";
 
 export interface PaginationResponse {
-    page: number;
-    limit: number;
     startIndex: number;
     endIndex: number;
 }
@@ -25,8 +23,6 @@ export function pagination(request: Request): PaginationResponse {
     const endIndex: number = page * limit;
 
     const paginationResponse = {
-        page,
-        limit,
         startIndex,
         endIndex
     }
