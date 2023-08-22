@@ -4,7 +4,7 @@ class Movie {
   id: string;
   title: string;
   year: string;
-  genre: string;
+  genre: string[];
   director: string;
   minutes: number;
   imdbScore: number;

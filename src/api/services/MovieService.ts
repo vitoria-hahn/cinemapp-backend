@@ -1,3 +1,4 @@
+import { FilterResponse, filter } from "../controllers/utils/Filter";
 import { PaginationResponse, pagination } from "../controllers/utils/Pagination";
 import { Movie } from "../models/Movie";
 import { GetAllResponse } from "../repositories/MoviesPostgresRepository";
@@ -27,7 +28,9 @@ export class MovieService {
     async getAll(request: Request): Promise<PaginatedMoviesResponse> {
         const paginationResult: PaginationResponse = pagination(request);
 
-        const paginatedMovies: GetAllResponse = await this.moviesRepository.getAll(paginationResult.startIndex, paginationResult.endIndex);
+        const filterResult: FilterResponse = filter(request);
+
+        const paginatedMovies: GetAllResponse = await this.moviesRepository.getAll(paginationResult.startIndex, paginationResult.endIndex, filterResult.column, filterResult.value);
 
         const paginatedMovieResponse = {
             page: paginationResult.page,
