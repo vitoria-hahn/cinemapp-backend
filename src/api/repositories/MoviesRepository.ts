@@ -6,7 +6,7 @@ interface MoviesRepository {
 
   getById(id: string): Promise<Movie>;
 
-  getAll(startIndex: number, endIndex: number, column?: string, value?: string): Promise<GetAllResponse>;
+  getAll(startIndex: number, endIndex: number, column?: string, value?: string, sign?: string): Promise<GetAllResponse>;
 
   delete(id: string): Promise<number>;
 }
