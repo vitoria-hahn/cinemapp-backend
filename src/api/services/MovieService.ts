@@ -30,7 +30,7 @@ export class MovieService {
 
         const filterResult: FilterResponse = filter(request);
 
-        const paginatedMovies: GetAllResponse = await this.moviesRepository.getAll(paginationResult.startIndex, paginationResult.endIndex, filterResult.column, filterResult.value);
+        const paginatedMovies: GetAllResponse = await this.moviesRepository.getAll(paginationResult.startIndex, paginationResult.endIndex, filterResult.column, filterResult.value, filterResult.sign);
 
         const paginatedMovieResponse = {
             page: paginationResult.page,
