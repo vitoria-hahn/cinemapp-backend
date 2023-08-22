@@ -41,17 +41,21 @@ class MoviesPostgresRepository implements MoviesRepository {
     return response.rows[0];
   }
 
-  async getAll(startIndex: number, endIndex: number, column?: string, value?: string): Promise<GetAllResponse> {
+  async getAll(startIndex: number, endIndex: number, column?: string, value?: string, sign?: string): Promise<GetAllResponse> {
     let responseSelect;
     let responseCount;
 
-    if (column && value) {
+    if (column == "genre") {
       responseSelect = this.client.query("SELECT * FROM MOVIES WHERE $1 = ANY(MOVIES." + column + ") LIMIT $2 OFFSET $3;", [value, endIndex, startIndex]);
       responseCount = this.client.query("SELECT COUNT(*) FROM MOVIES WHERE $1 = ANY(MOVIES." + column + ");", [value]);
-    } else {
-      responseSelect = this.client.query("SELECT * FROM MOVIES LIMIT $1 OFFSET $2;", [endIndex, startIndex]);
-      responseCount = this.client.query("SELECT COUNT(*) FROM MOVIES;");
-    }
+    } else
+      if (column == "imdbScore") {
+        responseSelect = this.client.query("SELECT * FROM MOVIES WHERE " + column + "" + sign + "= $1 LIMIT $2 OFFSET $3;", [parseFloat(value as string), endIndex, startIndex]);
+        responseCount = this.client.query("SELECT COUNT(*) FROM MOVIES WHERE " + column + "" + sign + "= $1;", [parseFloat(value as string)]);
+      } else {
+        responseSelect = this.client.query("SELECT * FROM MOVIES LIMIT $1 OFFSET $2;", [endIndex, startIndex]);
+        responseCount = this.client.query("SELECT COUNT(*) FROM MOVIES;");
+      }
 
     const promises = [responseSelect, responseCount];
 
