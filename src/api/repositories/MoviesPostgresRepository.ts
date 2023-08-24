@@ -3,6 +3,8 @@ import { MoviesRepository } from "./MoviesRepository";
 
 import { connection } from "../database/connection";
 import { Client } from "pg";
+import { buildSqlRawCountQuery, buildSqlRawSelectQuery } from "../controllers/utils/Query";
+import { GetAllProps } from "../controllers/utils/GetAllProps";
 
 export interface GetAllResponse {
   data: Movie[];
@@ -41,21 +43,18 @@ class MoviesPostgresRepository implements MoviesRepository {
     return response.rows[0];
   }
 
-  async getAll(startIndex: number, endIndex: number, column?: string, value?: string, sign?: string): Promise<GetAllResponse> {
+  async getAll(props: GetAllProps): Promise<GetAllResponse> {
     let responseSelect;
     let responseCount;
 
-    if (column == "genre") {
-      responseSelect = this.client.query("SELECT * FROM MOVIES WHERE $1 = ANY(MOVIES." + column + ") LIMIT $2 OFFSET $3;", [value, endIndex, startIndex]);
-      responseCount = this.client.query("SELECT COUNT(*) FROM MOVIES WHERE $1 = ANY(MOVIES." + column + ");", [value]);
-    } else
-      if (column == "imdbScore") {
-        responseSelect = this.client.query("SELECT * FROM MOVIES WHERE " + column + "" + sign + "= $1 LIMIT $2 OFFSET $3;", [parseFloat(value as string), endIndex, startIndex]);
-        responseCount = this.client.query("SELECT COUNT(*) FROM MOVIES WHERE " + column + "" + sign + "= $1;", [parseFloat(value as string)]);
-      } else {
-        responseSelect = this.client.query("SELECT * FROM MOVIES LIMIT $1 OFFSET $2;", [endIndex, startIndex]);
-        responseCount = this.client.query("SELECT COUNT(*) FROM MOVIES;");
-      }
+    const { limit, offset, filter } = props;
+
+    const tableName = "movies";
+    const rawSelectQuery = buildSqlRawSelectQuery(tableName, limit, offset, filter);
+    const rawCountQuery = buildSqlRawCountQuery(tableName, filter);
+
+    responseSelect = this.client.query(rawSelectQuery);
+    responseCount = this.client.query(rawCountQuery);
 
     const promises = [responseSelect, responseCount];
 
@@ -63,7 +62,7 @@ class MoviesPostgresRepository implements MoviesRepository {
 
     return {
       data: response[0].rows,
-      count: response[1].rows[0].count,
+      count: response[1].rows[0].total,
     }
   }
 

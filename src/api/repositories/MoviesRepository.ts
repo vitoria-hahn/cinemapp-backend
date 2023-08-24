@@ -1,3 +1,5 @@
+import { GetAllProps } from "../controllers/utils/GetAllProps";
+import { PaginationResponse } from "../controllers/utils/Pagination";
 import { Movie } from "../models/Movie";
 import { GetAllResponse } from "./MoviesPostgresRepository";
 
@@ -6,7 +8,7 @@ interface MoviesRepository {
 
   getById(id: string): Promise<Movie>;
 
-  getAll(startIndex: number, endIndex: number, column?: string, value?: string, sign?: string): Promise<GetAllResponse>;
+  getAll(props: GetAllProps): Promise<GetAllResponse>;
 
   delete(id: string): Promise<number>;
 }
