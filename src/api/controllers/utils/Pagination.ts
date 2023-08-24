@@ -1,5 +1,3 @@
-import { Request } from "express";
-
 export interface PaginationResponse {
     startIndex: number;
     endIndex: number;
@@ -7,13 +5,10 @@ export interface PaginationResponse {
     limit: number;
 }
 
-export function pagination(request: Request): PaginationResponse {
-    let page: number;
-    let limit: number;
-
-    if (validRequest(request)) {
-        page = parseInt(request.query.page as string);
-        limit = parseInt(request.query.limit as string);
+export function pagination(page: number, limit: number): PaginationResponse {
+    if (validRequest(page, limit)) {
+        page = page;
+        limit = limit;
     } else {
 
         page = 1;
@@ -33,9 +28,9 @@ export function pagination(request: Request): PaginationResponse {
     return paginationResponse;
 }
 
-function validRequest(request: Request): Boolean {
-    if (request.query.page && parseInt(request.query.page as string) >= 1) {
-        if (request.query.limit && parseInt(request.query.limit as string) >= 1 && parseInt(request.query.limit as string) <= 100) {
+function validRequest(page: number, limit: number): Boolean {
+    if (page >= 1) {
+        if (limit <= 100) {
             return true;
         }
     }

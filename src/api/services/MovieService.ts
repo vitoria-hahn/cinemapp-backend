@@ -1,5 +1,4 @@
-import { FilterResponse, filter } from "../controllers/utils/Filter";
-import { PaginationResponse, pagination } from "../controllers/utils/Pagination";
+import { getAllPropsObjectFromRequest } from "../controllers/utils/GetAllProps";
 import { Movie } from "../models/Movie";
 import { GetAllResponse } from "../repositories/MoviesPostgresRepository";
 import { MoviesRepository } from "../repositories/MoviesRepository";
@@ -17,8 +16,8 @@ interface CreateMovieDTO {
 }
 
 export interface PaginatedMoviesResponse {
-    page: number;
     limit: number;
+    page: number;
     movies: GetAllResponse;
 }
 
@@ -26,15 +25,13 @@ export class MovieService {
     constructor(private moviesRepository: MoviesRepository) { }
 
     async getAll(request: Request): Promise<PaginatedMoviesResponse> {
-        const paginationResult: PaginationResponse = pagination(request);
+        const props = getAllPropsObjectFromRequest(request);
 
-        const filterResult: FilterResponse = filter(request);
-
-        const paginatedMovies: GetAllResponse = await this.moviesRepository.getAll(paginationResult.startIndex, paginationResult.endIndex, filterResult.column, filterResult.value, filterResult.sign);
+        const paginatedMovies: GetAllResponse = await this.moviesRepository.getAll(props);
 
         const paginatedMovieResponse = {
-            page: paginationResult.page,
-            limit: paginationResult.limit,
+            limit: props.limit,
+            page: props.offset,
             movies: paginatedMovies,
         };
 
