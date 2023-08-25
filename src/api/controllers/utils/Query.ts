@@ -4,40 +4,41 @@ interface Filter {
     operator: string;
 }
 
-export function buildSqlRawSelectQuery(tableName: string, limit: number, offset: number, filter?: Filter): string {
+export function buildSqlRawSelectQuery(tableName: string, limit: number, offset: number, filters?: Filter[]): string {
     let query = `SELECT * FROM ${tableName}`;
 
-    if (filter) {
+    if (filters && filters.length > 0) {
         query += ' WHERE ';
-        let filterCondition;
-        if (filter.field == "genre") {
-            filterCondition = `'${filter.value}' = ANY (${tableName}.${filter.field})`;
-        } else {
-            filterCondition = `${filter.field} ${filter.operator} ${filter.value}`;
-        }
+        const filterConditions = filters.map(filter => {
+            if (filter.field === "genre") {
+                return `'${filter.value}' = ANY (${tableName}.${filter.field})`;
+            } else {
+                return `${filter.field} ${filter.operator} ${filter.value}`;
+            }
+        });
 
-        query += filterCondition;
+        query += filterConditions.join(' AND ');
     }
-
 
     query += ` LIMIT ${limit} OFFSET ${offset};`;
 
     return query;
 }
 
-export function buildSqlRawCountQuery(tableName: string, filter?: Filter): string {
+export function buildSqlRawCountQuery(tableName: string, filters?: Filter[]): string {
     let query = `SELECT COUNT(*) as total FROM ${tableName}`;
 
-    if (filter) {
+    if (filters && filters.length > 0) {
         query += ' WHERE ';
-        let filterCondition;
-        if (filter.field == "genre") {
-            filterCondition = `'${filter.value}' = ANY (${tableName}.${filter.field})`;
-        } else {
-            filterCondition = `${filter.field} ${filter.operator} ${filter.value}`;
-        }
+        const filterConditions = filters.map(filter => {
+            if (filter.field === "genre") {
+                return `'${filter.value}' = ANY (${tableName}.${filter.field})`;
+            } else {
+                return `${filter.field} ${filter.operator} ${filter.value}`;
+            }
+        });
 
-        query += filterCondition;
+        query += filterConditions.join(' AND ');
     }
 
     return query;
