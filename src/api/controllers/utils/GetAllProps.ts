@@ -27,7 +27,7 @@ export function getAllPropsObjectFromRequest(request: Request): GetAllProps {
         const [field, operator, value] = filterParam.split("||");
         const filterObject = {
             field: field,
-            value: parseFloat(value),
+            value: value,
             operator: operator
         };
         filters = filterObject;

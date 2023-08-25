@@ -9,9 +9,16 @@ export function buildSqlRawSelectQuery(tableName: string, limit: number, offset:
 
     if (filter) {
         query += ' WHERE ';
-        const filterCondition = `${filter.field} ${filter.operator} ${filter.value}`;
+        let filterCondition;
+        if (filter.field == "genre") {
+            filterCondition = `'${filter.value}' = ANY (${tableName}.${filter.field})`;
+        } else {
+            filterCondition = `${filter.field} ${filter.operator} ${filter.value}`;
+        }
+
         query += filterCondition;
     }
+
 
     query += ` LIMIT ${limit} OFFSET ${offset};`;
 
@@ -23,7 +30,13 @@ export function buildSqlRawCountQuery(tableName: string, filter?: Filter): strin
 
     if (filter) {
         query += ' WHERE ';
-        const filterCondition = `${filter.field} ${filter.operator} ${filter.value};`;
+        let filterCondition;
+        if (filter.field == "genre") {
+            filterCondition = `'${filter.value}' = ANY (${tableName}.${filter.field})`;
+        } else {
+            filterCondition = `${filter.field} ${filter.operator} ${filter.value}`;
+        }
+
         query += filterCondition;
     }
 
