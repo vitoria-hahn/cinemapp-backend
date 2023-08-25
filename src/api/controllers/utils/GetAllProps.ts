@@ -5,10 +5,32 @@ export interface GetAllProps {
     limit: number;
     offset: number;
     filter?:
-    {
+    [{
         field: string;
         value: any;
         operator: string;
+    }]
+}
+
+function parseFilters(filterParam: string): any {
+    if (!filterParam) {
+        return null;
+    }
+
+    const filterClauses = filterParam.split(",");
+    const filters = filterClauses.map(filterClause => {
+        const [field, operator, value] = filterClause.split("||");
+        return {
+            field: field,
+            value: value,
+            operator: operator
+        };
+    });
+
+    if (filters.length === 1) {
+        return filters[0];
+    } else {
+        return filters;
     }
 }
 
@@ -20,29 +42,14 @@ export function getAllPropsObjectFromRequest(request: Request): GetAllProps {
 
     const filterParam = request.query.filter as string;
 
-    let filters;
-    let getAllProps;
+    const filters = parseFilters(filterParam);
 
-    if (filterParam) {
-        const [field, operator, value] = filterParam.split("||");
-        const filterObject = {
-            field: field,
-            value: value,
-            operator: operator
-        };
-        filters = filterObject;
+    const getAllProps: GetAllProps = {
+        limit: paginationResult.endIndex,
+        offset: paginationResult.startIndex,
+        filter: filters,
+    };
 
-        getAllProps = {
-            limit: paginationResult.endIndex,
-            offset: paginationResult.startIndex,
-            filter: filters
-        };
-    } else {
-        getAllProps = {
-            limit: paginationResult.endIndex,
-            offset: paginationResult.startIndex,
-        };
-    }
-
+    console.log(getAllProps)
     return getAllProps;
 }
