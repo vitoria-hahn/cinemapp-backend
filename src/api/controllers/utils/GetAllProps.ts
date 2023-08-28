@@ -50,6 +50,5 @@ export function getAllPropsObjectFromRequest(request: Request): GetAllProps {
         filter: filters,
     };
 
-    console.log(getAllProps)
     return getAllProps;
 }
