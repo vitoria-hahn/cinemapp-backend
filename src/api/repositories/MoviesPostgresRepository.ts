@@ -56,10 +56,11 @@ class MoviesPostgresRepository implements MoviesRepository {
       let responseCount;
 
       const { limit, offset, filter } = props;
+      const alias = "movie";
 
       const tableName = "movies";
-      const rawSelectQuery = buildSqlRawSelectQuery(tableName, limit, offset, filter);
-      const rawCountQuery = buildSqlRawCountQuery(tableName, filter);
+      const rawSelectQuery = buildSqlRawSelectQuery(tableName, alias, limit, offset, filter);
+      const rawCountQuery = buildSqlRawCountQuery(tableName, alias, filter);
 
       responseSelect = this.client.query(rawSelectQuery);
       responseCount = this.client.query(rawCountQuery);
