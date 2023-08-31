@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import { Movie } from "../../models/Movie";
+import { Movie } from "../models/Movie";
 
 export interface GetAllResponse {
     data: Movie[];

@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import { getAllPropsObjectFromRequest } from "../utils/GetAllProps";
+import { GetAllProps, getAllPropsObjectFromRequest } from "../utils/GetAllProps";
 import { CustomResponse, GetAllResponse } from "../utils/Response";
 import { Movie } from "../models/Movie";
 import { MoviesRepository } from "../repositories/MoviesRepository";
@@ -19,15 +19,13 @@ interface CreateMovieDTO {
 export class MovieService {
     constructor(private moviesRepository: MoviesRepository) { }
 
-    async getAll(request: Request): Promise<CustomResponse> {
+    async getAll(requestWithProps: GetAllProps): Promise<CustomResponse> {
         try {
-            const props = getAllPropsObjectFromRequest(request);
-
-            const paginatedMovies: GetAllResponse = await this.moviesRepository.getAll(props);
+            const paginatedMovies: GetAllResponse = await this.moviesRepository.getAll(requestWithProps);
 
             const paginatedMovieResponse = {
-                limit: props.limit,
-                page: props.offset,
+                limit: requestWithProps.limit,
+                page: requestWithProps.offset,
                 movies: paginatedMovies,
             };
 

@@ -4,8 +4,6 @@ interface Filter {
     operator: string;
 }
 
-const validColumns = ["genre", "imdbScore", "title", "director", "year"];
-
 export function buildSqlRawSelectQuery(tableName: string, limit: number, offset: number, filters?: Filter[]): string {
     const alias = "movie";
 
@@ -14,14 +12,10 @@ export function buildSqlRawSelectQuery(tableName: string, limit: number, offset:
     if (filters && filters.length > 0) {
         query += ' WHERE ';
         const filterConditions = filters.map(filter => {
-            if (validColumns.includes(filter.field)) {
-                if (filter.field === "genre") {
-                    return `'${filter.value}' = ANY (${alias}.${filter.field})`;
-                } else {
-                    return `${filter.field} ${filter.operator} ${filter.value}`;
-                }
+            if (filter.field === "genre") {
+                return `'${filter.value}' = ANY (${alias}.${filter.field})`;
             } else {
-                throw SyntaxError("invalid column to filter");
+                return `${filter.field} ${filter.operator} ${filter.value}`;
             }
         });
 
