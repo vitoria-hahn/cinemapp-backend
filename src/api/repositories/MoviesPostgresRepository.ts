@@ -38,10 +38,11 @@ class MoviesPostgresRepository implements MoviesRepository {
   async getById(id: string): Promise<Movie> {
     try {
       const response = await this.client.query(
-        "SELECT * FROM MOVIES WHERE MOVIES.id = $1;", [id]
+        "SELECT * FROM MOVIES WHERE MOVIES.id = $1;",
+        [id],
       );
       if (!response.rows[0]) {
-        throw new Error(`no movie with id: ${id} exists`)
+        throw new Error(`no movie with id: ${id} exists`);
       } else {
         return response.rows[0];
       }
@@ -52,18 +53,21 @@ class MoviesPostgresRepository implements MoviesRepository {
 
   async getAll(props: GetAllProps): Promise<GetAllResponse> {
     try {
-      let responseSelect;
-      let responseCount;
-
       const { limit, offset, filter } = props;
       const alias = "movie";
 
       const tableName = "movies";
-      const rawSelectQuery = buildSqlRawSelectQuery(tableName, alias, limit, offset, filter);
+      const rawSelectQuery = buildSqlRawSelectQuery(
+        tableName,
+        alias,
+        limit,
+        offset,
+        filter,
+      );
       const rawCountQuery = buildSqlRawCountQuery(tableName, alias, filter);
 
-      responseSelect = this.client.query(rawSelectQuery);
-      responseCount = this.client.query(rawCountQuery);
+      const responseSelect = this.client.query(rawSelectQuery);
+      const responseCount = this.client.query(rawCountQuery);
 
       const promises = [responseSelect, responseCount];
 
@@ -72,7 +76,7 @@ class MoviesPostgresRepository implements MoviesRepository {
       return {
         data: response[0].rows,
         count: response[1].rows[0].total,
-      }
+      };
     } catch (error) {
       throw new Error(`${error}`);
     }
@@ -81,12 +85,11 @@ class MoviesPostgresRepository implements MoviesRepository {
   async delete(id: Movie["id"]): Promise<void> {
     try {
       if (await this.getById(id)) {
-        const result = await this.client.query(
-          "DELETE FROM MOVIES WHERE MOVIES.id = $1;", [id]
-        );
+        await this.client.query("DELETE FROM MOVIES WHERE MOVIES.id = $1;", [
+          id,
+        ]);
       } else {
         throw new Error("id does not exist");
-
       }
     } catch (error) {
       throw new Error(`${error}`);
