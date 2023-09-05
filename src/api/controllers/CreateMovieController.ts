@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { MovieService } from "../services/MovieService";
+import { returnResponse } from "../utils/Response";
 
 class CreateMovieController {
-  constructor(private movieService: MovieService) { }
+  constructor(private movieService: MovieService) {}
   async handle(request: Request, response: Response) {
     const { title, year, genre, director, minutes, imdbScore, summary } =
       request.body;
@@ -17,7 +18,7 @@ class CreateMovieController {
       summary,
     });
 
-    return response.sendStatus(result);
+    returnResponse(result, response);
   }
 }
 

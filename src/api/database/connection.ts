@@ -12,16 +12,17 @@ const connection = new Client({
 
 let isConnected = false;
 
-connection.connect()
+connection
+  .connect()
   .then(() => {
     isConnected = true;
     console.log("Connected!");
   })
-  .catch(error => {
+  .catch((error) => {
     console.error("Error connecting to the database:", error.message);
   });
 
-const connectDb = async (): Promise<Client> => {
+async (): Promise<Client> => {
   if (!isConnected) {
     console.log("Connecting to the database...");
     try {

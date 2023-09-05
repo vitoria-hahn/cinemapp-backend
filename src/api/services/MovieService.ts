@@ -1,88 +1,134 @@
-import { getAllPropsObjectFromRequest } from "../controllers/utils/GetAllProps";
+import { StatusCodes } from "http-status-codes";
+import { CustomResponse, GetAllResponse } from "../utils/Response";
 import { Movie } from "../models/Movie";
-import { GetAllResponse } from "../repositories/MoviesPostgresRepository";
 import { MoviesRepository } from "../repositories/MoviesRepository";
-import { Request } from "express";
-
+import { GetAllProps } from "../utils/PaginationFilter";
 
 interface CreateMovieDTO {
-    title: string;
-    year: number;
-    genre: string[];
-    director: string;
-    minutes: number;
-    imdbScore: number;
-    summary: string;
-}
-
-export interface PaginatedMoviesResponse {
-    limit: number;
-    page: number;
-    movies: GetAllResponse;
+  title: string;
+  year: number;
+  genre: string[];
+  director: string;
+  minutes: number;
+  imdbScore: number;
+  summary: string;
 }
 
 export class MovieService {
-    constructor(private moviesRepository: MoviesRepository) { }
+  constructor(private moviesRepository: MoviesRepository) {}
 
-    async getAll(request: Request): Promise<PaginatedMoviesResponse> {
-        const props = getAllPropsObjectFromRequest(request);
+  async getAll(requestWithProps: GetAllProps): Promise<CustomResponse> {
+    try {
+      const paginatedMovies: GetAllResponse =
+        await this.moviesRepository.getAll(requestWithProps);
 
-        const paginatedMovies: GetAllResponse = await this.moviesRepository.getAll(props);
+      const paginatedMovieResponse = {
+        limit: requestWithProps.limit,
+        page: requestWithProps.offset,
+        movies: paginatedMovies,
+      };
 
-        const paginatedMovieResponse = {
-            limit: props.limit,
-            page: props.offset,
-            movies: paginatedMovies,
+      return {
+        statusCode: StatusCodes.OK,
+        message: "movies fetched.",
+        return: paginatedMovieResponse,
+      };
+    } catch (error) {
+      return {
+        statusCode: StatusCodes.BAD_REQUEST,
+        message: `error fetching movies: ${error}`,
+        return: null,
+      };
+    }
+  }
+
+  async getById(id: string): Promise<CustomResponse> {
+    try {
+      const response = await this.moviesRepository.getById(id);
+
+      return {
+        statusCode: StatusCodes.OK,
+        message: `movie fetched with success`,
+        return: response,
+      };
+    } catch (error) {
+      return {
+        statusCode: StatusCodes.BAD_REQUEST,
+        message: `error fetching movie: ${error}`,
+        return: null,
+      };
+    }
+  }
+
+  async create({
+    title,
+    year,
+    genre,
+    director,
+    minutes,
+    imdbScore,
+    summary,
+  }: CreateMovieDTO): Promise<CustomResponse> {
+    try {
+      let movie = new Movie();
+
+      if (
+        year < 2100 &&
+        year > 0 &&
+        minutes > 0 &&
+        minutes < 1000 &&
+        imdbScore <= 10 &&
+        imdbScore >= 0
+      ) {
+        movie = Object.assign({
+          ...movie,
+          title,
+          year,
+          genre,
+          director,
+          minutes,
+          imdbScore,
+          summary,
+        });
+
+        const response = await this.moviesRepository.create(movie);
+
+        return {
+          statusCode: StatusCodes.OK,
+          message: `movie created with success`,
+          return: response,
         };
-
-        return paginatedMovieResponse;
+      } else {
+        return {
+          statusCode: StatusCodes.NOT_ACCEPTABLE,
+          message: "request body not accepted, syntax error",
+          return: null,
+        };
+      }
+    } catch (error) {
+      return {
+        statusCode: StatusCodes.BAD_REQUEST,
+        message: `error fetching movies: ${error}`,
+        return: null,
+      };
     }
+  }
 
+  async delete(id: string): Promise<CustomResponse> {
+    try {
+      const response = await this.moviesRepository.delete(id);
 
-    async getById(id: string): Promise<Movie> {
-        const response: Movie = await this.moviesRepository.getById(id);
-
-        return response;
+      return {
+        statusCode: StatusCodes.OK,
+        message: `movie deleted with success: ${id}`,
+        return: response,
+      };
+    } catch (error) {
+      return {
+        statusCode: StatusCodes.BAD_REQUEST,
+        message: `error deleting movies: ${error}`,
+        return: null,
+      };
     }
-
-    async create({
-        title,
-        year,
-        genre,
-        director,
-        minutes,
-        imdbScore,
-        summary,
-    }: CreateMovieDTO): Promise<number> {
-        let movie = new Movie();
-
-        if (year < 2100 && year > 0 && minutes > 0 && minutes < 1000 && imdbScore <= 10 && imdbScore >= 0) {
-            movie = Object.assign({
-                ...movie,
-                title,
-                year,
-                genre,
-                director,
-                minutes,
-                imdbScore,
-                summary,
-            });
-
-            await this.moviesRepository.create(movie);
-
-            return 200;
-        } else {
-            return 500;
-        }
-    }
-
-    async delete(id: string): Promise<number> {
-        const response = await this.moviesRepository.delete(id);
-
-        if (response == 200) {
-            return response;
-        }
-
-        return response;
-    }
+  }
 }
