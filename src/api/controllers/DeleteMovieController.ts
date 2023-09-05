@@ -1,6 +1,6 @@
 import { MovieService } from "../services/MovieService";
 import { Request, Response } from "express";
-import { returnResponse } from "../utils/StatusCodeValidation";
+import { returnResponse } from "../utils/Response";
 
 class DeleteMovieController {
   constructor(private movieService: MovieService) {}

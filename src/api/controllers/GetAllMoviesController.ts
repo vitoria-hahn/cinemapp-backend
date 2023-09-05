@@ -1,9 +1,8 @@
 import { MovieService } from "../services/MovieService";
 import { Response, Request } from "express";
-import { CustomResponse } from "../utils/Response";
+import { CustomResponse, returnResponse } from "../utils/Response";
 import { StatusCodes } from "http-status-codes";
-import { getAllPropsObjectFromRequest } from "../utils/GetAllProps";
-import { returnResponse } from "../utils/StatusCodeValidation";
+import { getAllPropsObjectFromRequest } from "../utils/PaginationFilter";
 
 class GetAllMoviesController {
   constructor(private movieService: MovieService) {}
@@ -23,11 +22,13 @@ class GetAllMoviesController {
 
       returnResponse(result, response);
     } else {
-      response
-        .status(StatusCodes.BAD_REQUEST)
-        .send(
+      const r = {
+        statusCode: StatusCodes.BAD_REQUEST,
+        message:
           "movies can only be filtered by imdbScore, genre, director, minutes and title",
-        );
+        return: null,
+      };
+      response.status(StatusCodes.BAD_REQUEST).json({ error: r });
     }
   }
 }

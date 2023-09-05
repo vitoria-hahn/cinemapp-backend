@@ -1,6 +1,6 @@
-import { GetAllProps } from "../utils/GetAllProps";
 import { GetAllResponse } from "../utils/Response";
 import { Movie } from "../models/Movie";
+import { GetAllProps } from "../utils/PaginationFilter";
 
 interface MoviesRepository {
   create(movie: Movie): Promise<void>;

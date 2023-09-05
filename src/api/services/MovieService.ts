@@ -1,8 +1,8 @@
 import { StatusCodes } from "http-status-codes";
-import { GetAllProps } from "../utils/GetAllProps";
 import { CustomResponse, GetAllResponse } from "../utils/Response";
 import { Movie } from "../models/Movie";
 import { MoviesRepository } from "../repositories/MoviesRepository";
+import { GetAllProps } from "../utils/PaginationFilter";
 
 interface CreateMovieDTO {
   title: string;
@@ -44,7 +44,7 @@ export class MovieService {
 
   async getById(id: string): Promise<CustomResponse> {
     try {
-      const response: Movie = await this.moviesRepository.getById(id);
+      const response = await this.moviesRepository.getById(id);
 
       return {
         statusCode: StatusCodes.OK,

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { MovieService } from "../services/MovieService";
-import { returnResponse } from "../utils/StatusCodeValidation";
+import { returnResponse } from "../utils/Response";
 
 class CreateMovieController {
   constructor(private movieService: MovieService) {}
