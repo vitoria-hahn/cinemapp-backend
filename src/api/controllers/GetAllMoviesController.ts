@@ -6,10 +6,17 @@ import { getAllPropsObjectFromRequest } from "../utils/PaginationFilter";
 
 class GetAllMoviesController {
   constructor(private movieService: MovieService) {}
-  async handle(request: Request, response: Response): Promise<void> {
+  async handle(request: Request, response: Response) {
     const requestWithProps = getAllPropsObjectFromRequest(request);
 
-    const validcolumns = ["imdbScore", "genre", "director", "minutes", "title"];
+    const validcolumns = [
+      "imdbScore",
+      "genre",
+      "director",
+      "minutes",
+      "title",
+      "summary",
+    ];
 
     const validFilters = requestWithProps.filter?.every((filter) => {
       return validcolumns.includes(filter.field);
@@ -20,7 +27,7 @@ class GetAllMoviesController {
         requestWithProps,
       );
 
-      returnResponse(result, response);
+      return returnResponse(result, response);
     } else {
       const r = {
         statusCode: StatusCodes.BAD_REQUEST,
