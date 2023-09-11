@@ -2,7 +2,6 @@ interface Filter {
   field: string;
   value: any;
   operator: string;
-  searchTerm?: string;
 }
 
 enum Operator {
@@ -10,16 +9,27 @@ enum Operator {
   gt = ">",
   ls = "<",
   has = "has",
+  src = "src",
+}
+
+function paginationQuery(limit: number, offset: number) {
+  let query = "";
+
+  query += ` LIMIT ${limit} OFFSET ${offset};`;
+
+  return query;
 }
 
 function filterQuery(filters: Filter[], alias: string) {
   let query = "";
 
-  if (filters && filters.length > 0) {
+  if (filters && filters.length > 0 && Array.isArray(filters)) {
     query += " WHERE ";
     const filterConditions = filters.map((filter) => {
       if (filter.operator === Operator.has) {
         return `'${filter.value}' = ANY (${alias}.${filter.field})`;
+      } else if (filter.operator === Operator.src) {
+        return `to_tsvector('english', unaccent(${alias}.${filter.field})) @@ to_tsquery('english', '${filter.value}:*')`;
       } else {
         return `${filter.field} ${filter.operator} ${filter.value}`;
       }
@@ -44,7 +54,8 @@ export function buildSqlRawSelectQuery(
     query += filterQuery(filters, alias);
   }
 
-  query += ` LIMIT ${limit} OFFSET ${offset};`;
+  paginationQuery(limit, offset);
+  console.log(query);
 
   return query;
 }
