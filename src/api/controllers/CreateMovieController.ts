@@ -18,7 +18,7 @@ class CreateMovieController {
       summary,
     });
 
-    returnResponse(result, response);
+    return returnResponse(result, response);
   }
 }
 
