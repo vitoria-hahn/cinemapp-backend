@@ -9,14 +9,14 @@ enum Operator {
   gt = ">",
   ls = "<",
   has = "has",
-  src = "src",
+  search = "search",
 }
 
-function paginationQuery(limit: number, offset: number) {
+function buildPaginationQuery(limit: number, offset: number) {
   return ` LIMIT ${limit} OFFSET ${offset};`;
 }
 
-function filterQuery(filters: Filter[], alias: string) {
+function buildFilterQuery(filters: Filter[], alias: string) {
   if (!filters || filters.length === 0 || !Array.isArray(filters)) {
     return "";
   }
@@ -25,7 +25,7 @@ function filterQuery(filters: Filter[], alias: string) {
   const filterConditions = filters.map((filter) => {
     if (filter.operator === Operator.has) {
       return `'${filter.value}' = ANY (${alias}.${filter.field})`;
-    } else if (filter.operator === Operator.src) {
+    } else if (filter.operator === Operator.search) {
       return `to_tsvector('english', unaccent(${alias}.${filter.field})) @@ to_tsquery('english', '${filter.value}:*')`;
     } else {
       return `${filter.field} ${filter.operator} ${filter.value}`;
@@ -47,10 +47,10 @@ export function buildSqlRawSelectQuery(
   let query = `SELECT * FROM ${tableName} AS ${alias}`;
 
   if (filters) {
-    query += filterQuery(filters, alias);
+    query += buildFilterQuery(filters, alias);
   }
 
-  paginationQuery(limit, offset);
+  buildPaginationQuery(limit, offset);
   console.log(query);
 
   return query;
@@ -64,7 +64,7 @@ export function buildSqlRawCountQuery(
   let query = `SELECT COUNT(*) as total FROM ${tableName} AS ${alias}`;
 
   if (filters) {
-    query += filterQuery(filters, alias);
+    query += buildFilterQuery(filters, alias);
   }
 
   return query;
