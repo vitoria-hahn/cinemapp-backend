@@ -12,7 +12,6 @@ enum Operator {
   src = "src",
 }
 
-
 function paginationQuery(limit: number, offset: number) {
   return ` LIMIT ${limit} OFFSET ${offset};`;
 }
