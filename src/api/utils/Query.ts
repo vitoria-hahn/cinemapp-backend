@@ -17,22 +17,22 @@ function paginationQuery(limit: number, offset: number) {
 }
 
 function filterQuery(filters: Filter[], alias: string) {
-  let query = "";
-
-  if (filters && filters.length > 0 && Array.isArray(filters)) {
-    query += " WHERE ";
-    const filterConditions = filters.map((filter) => {
-      if (filter.operator === Operator.has) {
-        return `'${filter.value}' = ANY (${alias}.${filter.field})`;
-      } else if (filter.operator === Operator.src) {
-        return `to_tsvector('english', unaccent(${alias}.${filter.field})) @@ to_tsquery('english', '${filter.value}:*')`;
-      } else {
-        return `${filter.field} ${filter.operator} ${filter.value}`;
-      }
-    });
-
-    query += filterConditions.join(" AND ");
+  if (!filters || filters.length === 0 || !Array.isArray(filters)) {
+    return "";
   }
+
+  let query = " WHERE ";
+  const filterConditions = filters.map((filter) => {
+    if (filter.operator === Operator.has) {
+      return `'${filter.value}' = ANY (${alias}.${filter.field})`;
+    } else if (filter.operator === Operator.src) {
+      return `to_tsvector('english', unaccent(${alias}.${filter.field})) @@ to_tsquery('english', '${filter.value}:*')`;
+    } else {
+      return `${filter.field} ${filter.operator} ${filter.value}`;
+    }
+  });
+
+  query += filterConditions.join(" AND ");
 
   return query;
 }
