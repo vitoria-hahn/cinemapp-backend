@@ -12,12 +12,9 @@ enum Operator {
   src = "src",
 }
 
+
 function paginationQuery(limit: number, offset: number) {
-  let query = "";
-
-  query += ` LIMIT ${limit} OFFSET ${offset};`;
-
-  return query;
+  return ` LIMIT ${limit} OFFSET ${offset};`;
 }
 
 function filterQuery(filters: Filter[], alias: string) {
