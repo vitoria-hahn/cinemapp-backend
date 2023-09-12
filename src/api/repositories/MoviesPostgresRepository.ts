@@ -3,7 +3,10 @@ import { MoviesRepository } from "./MoviesRepository";
 
 import { connection } from "../database/connection";
 import { Client } from "pg";
-import { buildSqlRawCountQuery, buildSqlRawSelectQuery } from "../utils/Query";
+import {
+  buildSqlRawCountQuery,
+  buildSqlRawSelectQuery,
+} from "../utils/BuildQuery";
 import { GetAllResponse } from "../utils/Response";
 import { GetAllProps } from "../utils/PaginationFilter";
 

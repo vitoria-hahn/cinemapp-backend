@@ -1,8 +1,9 @@
-interface Filter {
-  field: string;
-  value: any;
-  operator: string;
-}
+import {
+  DefaultFilter,
+  Filter,
+  HasFilter,
+  SearchFilter,
+} from "../filters/Filter";
 
 enum Operator {
   eq = "=",
@@ -23,12 +24,15 @@ function buildFilterQuery(filters: Filter[], alias: string) {
 
   let query = " WHERE ";
   const filterConditions = filters.map((filter) => {
+    const hasStrategy = new HasFilter();
+    const searchStrategy = new SearchFilter();
+    const defaultStrategy = new DefaultFilter();
     if (filter.operator === Operator.has) {
-      return `'${filter.value}' = ANY (${alias}.${filter.field})`;
+      return hasStrategy.apply(filter, alias);
     } else if (filter.operator === Operator.search) {
-      return `to_tsvector('english', unaccent(${alias}.${filter.field})) @@ to_tsquery('english', '${filter.value}:*')`;
+      return searchStrategy.apply(filter, alias);
     } else {
-      return `${filter.field} ${filter.operator} ${filter.value}`;
+      return defaultStrategy.apply(filter, alias);
     }
   });
 
