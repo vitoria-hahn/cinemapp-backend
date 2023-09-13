@@ -3,11 +3,12 @@ import { MoviesRepository } from "./MoviesRepository";
 
 import { connection } from "../database/connection";
 import { Client } from "pg";
-
-export interface GetAllResponse {
-  data: Movie[];
-  count: number;
-}
+import {
+  buildSqlRawCountQuery,
+  buildSqlRawSelectQuery,
+} from "../utils/BuildQuery";
+import { GetAllResponse } from "../utils/Response";
+import { GetAllProps } from "../utils/PaginationFilter";
 
 class MoviesPostgresRepository implements MoviesRepository {
   private client: Client;
@@ -17,65 +18,84 @@ class MoviesPostgresRepository implements MoviesRepository {
   }
 
   async create(movie: Movie): Promise<void> {
-    const response = await this.client.query(
-      "INSERT INTO MOVIES(ID, TITLE, YEAR, GENRE, DIRECTOR, MINUTES, IMDBSCORE, SUMMARY) \
+    try {
+      await this.client.query(
+        "INSERT INTO MOVIES(ID, TITLE, YEAR, GENRE, DIRECTOR, MINUTES, IMDBSCORE, SUMMARY) \
         VALUES($1, $2, $3, $4, $5, $6, $7, $8);",
-      [
-        movie.id,
-        movie.title,
-        movie.year,
-        movie.genre,
-        movie.director,
-        movie.minutes,
-        movie.imdbScore,
-        movie.summary,
-      ],
-    );
-  }
-
-  async getById(id: string): Promise<Movie> {
-    const response = await this.client.query(
-      "SELECT * FROM MOVIES WHERE MOVIES.id = $1;", [id]
-    );
-
-    return response.rows[0];
-  }
-
-  async getAll(startIndex: number, endIndex: number, column?: string, value?: string, sign?: string): Promise<GetAllResponse> {
-    let responseSelect;
-    let responseCount;
-
-    if (column == "genre") {
-      responseSelect = this.client.query("SELECT * FROM MOVIES WHERE $1 = ANY(MOVIES." + column + ") LIMIT $2 OFFSET $3;", [value, endIndex, startIndex]);
-      responseCount = this.client.query("SELECT COUNT(*) FROM MOVIES WHERE $1 = ANY(MOVIES." + column + ");", [value]);
-    } else
-      if (column == "imdbScore") {
-        responseSelect = this.client.query("SELECT * FROM MOVIES WHERE " + column + "" + sign + "= $1 LIMIT $2 OFFSET $3;", [parseFloat(value as string), endIndex, startIndex]);
-        responseCount = this.client.query("SELECT COUNT(*) FROM MOVIES WHERE " + column + "" + sign + "= $1;", [parseFloat(value as string)]);
-      } else {
-        responseSelect = this.client.query("SELECT * FROM MOVIES LIMIT $1 OFFSET $2;", [endIndex, startIndex]);
-        responseCount = this.client.query("SELECT COUNT(*) FROM MOVIES;");
-      }
-
-    const promises = [responseSelect, responseCount];
-
-    const response = await Promise.all(promises);
-
-    return {
-      data: response[0].rows,
-      count: response[1].rows[0].count,
+        [
+          movie.id,
+          movie.title,
+          movie.year,
+          movie.genre,
+          movie.director,
+          movie.minutes,
+          movie.imdbScore,
+          movie.summary,
+        ],
+      );
+    } catch (error) {
+      throw new Error(`${error}`);
     }
   }
 
-  async delete(id: Movie["id"]): Promise<number> {
-
-    if (await this.getById(id)) {
-      await this.client.query(
-        "DELETE FROM MOVIES WHERE MOVIES.id = $1;", [id]
+  async getById(id: string): Promise<Movie> {
+    try {
+      const response = await this.client.query(
+        "SELECT * FROM MOVIES WHERE MOVIES.id = $1;",
+        [id],
       );
-      return 200;
-    } else {
-      return 404;
+      if (!response.rows[0]) {
+        throw new Error(`no movie with id: ${id} exists`);
+      } else {
+        return response.rows[0];
+      }
+    } catch (error) {
+      throw new Error(`${error}`);
+    }
+  }
+
+  async getAll(props: GetAllProps): Promise<GetAllResponse> {
+    try {
+      const { limit, offset, filter } = props;
+      const alias = "movie";
+
+      const tableName = "movies";
+      const rawSelectQuery = buildSqlRawSelectQuery(
+        tableName,
+        alias,
+        limit,
+        offset,
+        filter,
+      );
+      const rawCountQuery = buildSqlRawCountQuery(tableName, alias, filter);
+
+      const responseSelect = this.client.query(rawSelectQuery);
+      const responseCount = this.client.query(rawCountQuery);
+
+      const promises = [responseSelect, responseCount];
+
+      const response = await Promise.all(promises);
+
+      return {
+        data: response[0].rows,
+        count: response[1].rows[0].total,
+      };
+    } catch (error) {
+      throw new Error(`${error}`);
+    }
+  }
+
+  async delete(id: Movie["id"]): Promise<void> {
+    try {
+      if (await this.getById(id)) {
+        await this.client.query("DELETE FROM MOVIES WHERE MOVIES.id = $1;", [
+          id,
+        ]);
+      } else {
+        throw new Error("id does not exist");
+      }
+    } catch (error) {
+      throw new Error(`${error}`);
     }
   }
 }
