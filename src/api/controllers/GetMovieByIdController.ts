@@ -7,7 +7,7 @@ class GetMovieByIdController {
   async handle(request: Request, response: Response) {
     const result = await this.movieService.getById(request.params.id);
 
-    returnResponse(result, response);
+    return returnResponse(result, response);
   }
 }
 
