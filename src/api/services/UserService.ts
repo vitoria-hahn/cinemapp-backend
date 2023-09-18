@@ -51,45 +51,43 @@ export class UserService {
           message: `error logging in: user does not exist`,
           return: null,
         };
-      } else {
-        const secretKey = process.env.JWT_SECRET;
-        if (!secretKey) {
-          return {
-            statusCode: StatusCodes.BAD_REQUEST,
-            message: `secret key not provided`,
-            return: null,
-          };
-        }
-
-        const getUser = await this.userRepository.getById(user.username);
-
-        if (user && (await bcrypt.compare(user.password, getUser.password))) {
-          const payload = {
-            user: user.username,
-          };
-
-          const signOptions: SignOptions = {
-            algorithm: "HS256",
-            expiresIn: "120s",
-          };
-
-          const token = generateJWT(payload, signOptions, secretKey);
-          return {
-            statusCode: StatusCodes.OK,
-            message: `user logged in`,
-            return: {
-              token: token,
-              user: user.username,
-            },
-          };
-        } else {
-          return {
-            statusCode: StatusCodes.UNAUTHORIZED,
-            message: `incorrect password`,
-            return: null,
-          };
-        }
       }
+      const secretKey = process.env.JWT_SECRET;
+      if (!secretKey) {
+        return {
+          statusCode: StatusCodes.BAD_REQUEST,
+          message: `secret key not provided`,
+          return: null,
+        };
+      }
+
+      const getUser = await this.userRepository.getById(user.username);
+
+      if (user && (await bcrypt.compare(user.password, getUser.password))) {
+        const payload = {
+          user: user.username,
+        };
+
+        const signOptions: SignOptions = {
+          algorithm: "HS256",
+          expiresIn: "120s",
+        };
+
+        const token = generateJWT(payload, signOptions, secretKey);
+        return {
+          statusCode: StatusCodes.OK,
+          message: `user logged in`,
+          return: {
+            token: token,
+            user: user.username,
+          },
+        };
+      }
+      return {
+        statusCode: StatusCodes.UNAUTHORIZED,
+        message: `incorrect password`,
+        return: null,
+      };
     } catch (error) {
       return {
         statusCode: StatusCodes.FORBIDDEN,
