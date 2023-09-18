@@ -27,10 +27,6 @@ export const authenticateJWT = (
       }
     });
   } else {
-    return {
-      statusCode: StatusCodes.UNAUTHORIZED,
-      message: "please login",
-      return: null,
-    };
+    response.status(StatusCodes.FORBIDDEN).json({ error: "please, login" });
   }
 };

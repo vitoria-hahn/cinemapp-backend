@@ -70,7 +70,7 @@ export class UserService {
 
           const signOptions: SignOptions = {
             algorithm: "HS256",
-            expiresIn: "1h",
+            expiresIn: "120s",
           };
 
           const token = generateJWT(payload, signOptions, secretKey);
