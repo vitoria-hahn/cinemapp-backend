@@ -55,7 +55,6 @@ export function buildSqlRawSelectQuery(
   }
 
   buildPaginationQuery(limit, offset);
-  console.log(query);
 
   return query;
 }
