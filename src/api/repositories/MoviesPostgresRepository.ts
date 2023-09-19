@@ -6,9 +6,9 @@ import { Client } from "pg";
 import {
   buildSqlRawCountQuery,
   buildSqlRawSelectQuery,
-} from "../utils/BuildQuery";
+} from "../database/BuildQuery";
 import { GetAllResponse } from "../utils/Response";
-import { GetAllProps } from "../utils/PaginationFilter";
+import { GetAllProps } from "../filters/PaginationFilter";
 
 class MoviesPostgresRepository implements MoviesRepository {
   private client: Client;

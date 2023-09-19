@@ -2,7 +2,7 @@ import { StatusCodes } from "http-status-codes";
 import { CustomResponse, GetAllResponse } from "../utils/Response";
 import { Movie } from "../models/Movie";
 import { MoviesRepository } from "../repositories/MoviesRepository";
-import { GetAllProps } from "../utils/PaginationFilter";
+import { GetAllProps } from "../filters/PaginationFilter";
 
 interface CreateMovieDTO {
   title: string;
