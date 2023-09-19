@@ -10,7 +10,7 @@ export const authenticateJWT = (
   const secretKey = process.env.JWT_SECRET;
   if (!secretKey) {
     return {
-      statusCode: StatusCodes.BAD_REQUEST,
+      statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
       message: `secret key not provided`,
       return: null,
     };
@@ -21,12 +21,10 @@ export const authenticateJWT = (
     jwt.verify(token, secretKey, (err, user) => {
       if (err) {
         response.status(StatusCodes.BAD_REQUEST).json({ error: err });
-      } else {
-        (request as any).user = user;
-        next();
       }
+      (request as any).user = user;
+      next();
     });
-  } else {
-    response.status(StatusCodes.FORBIDDEN).json({ error: "please, login" });
   }
+  response.status(StatusCodes.UNAUTHORIZED).json({ error: "please, login" });
 };

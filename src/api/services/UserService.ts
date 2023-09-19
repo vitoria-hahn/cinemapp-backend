@@ -63,30 +63,35 @@ export class UserService {
 
       const getUser = await this.userRepository.getById(user.username);
 
-      if (user && (await bcrypt.compare(user.password, getUser.password))) {
-        const payload = {
-          user: user.username,
-        };
-
-        const signOptions: SignOptions = {
-          algorithm: "HS256",
-          expiresIn: "120s",
-        };
-
-        const token = generateJWT(payload, signOptions, secretKey);
+      const doPasswordsMatch = await bcrypt.compare(
+        user.password,
+        getUser.password,
+      );
+      if (!user && !doPasswordsMatch) {
         return {
-          statusCode: StatusCodes.OK,
-          message: `user logged in`,
-          return: {
-            token: token,
-            user: user.username,
-          },
+          statusCode: StatusCodes.UNAUTHORIZED,
+          message: `incorrect password`,
+          return: null,
         };
       }
+
+      const payload = {
+        user: user.username,
+      };
+
+      const signOptions: SignOptions = {
+        algorithm: "HS256",
+        expiresIn: "120s",
+      };
+
+      const token = generateJWT(payload, signOptions, secretKey);
       return {
-        statusCode: StatusCodes.UNAUTHORIZED,
-        message: `incorrect password`,
-        return: null,
+        statusCode: StatusCodes.OK,
+        message: `user logged in`,
+        return: {
+          token: token,
+          user: user.username,
+        },
       };
     } catch (error) {
       return {
