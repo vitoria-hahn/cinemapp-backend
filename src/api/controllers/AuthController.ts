@@ -1,11 +1,12 @@
 import { Response, Request } from "express";
 import { UserService } from "../services/UserService";
 import { returnResponse } from "../utils/Response";
+import { StatusCodes } from "http-status-codes";
 
-class LogInController {
+class AuthController {
   constructor(private userService: UserService) {}
 
-  async handle(request: Request, response: Response) {
+  async logInHandle(request: Request, response: Response) {
     const { username, password } = request.body;
 
     try {
@@ -19,10 +20,20 @@ class LogInController {
         return returnResponse(result, response);
       }
     } catch (error) {
-      console.error("Error during login:", error);
-      return response.status(500).json({ message: "Internal server error" });
+      return response.status(StatusCodes.UNAUTHORIZED).json({ message: error });
     }
+  }
+
+  async signUpHandle(request: Request, response: Response) {
+    const { username, password } = request.body;
+
+    const result = await this.userService.signUp({
+      username,
+      password,
+    });
+
+    return returnResponse(result, response);
   }
 }
 
-export { LogInController };
+export { AuthController };

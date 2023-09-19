@@ -16,8 +16,10 @@ export const authenticateJWT = (
     };
   }
   const token = request.headers.authorization?.slice(7);
+  console.log(token);
 
   if (token) {
+    console.log("com token");
     jwt.verify(token, secretKey, (err, user) => {
       if (err) {
         response.status(StatusCodes.BAD_REQUEST).json({ error: err });
@@ -25,6 +27,7 @@ export const authenticateJWT = (
       (request as any).user = user;
       next();
     });
+  } else {
+    response.status(StatusCodes.UNAUTHORIZED).json({ error: "please, login" });
   }
-  response.status(StatusCodes.UNAUTHORIZED).json({ error: "please, login" });
 };
