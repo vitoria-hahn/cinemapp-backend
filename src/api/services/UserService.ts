@@ -55,7 +55,7 @@ export class UserService {
       const secretKey = process.env.JWT_SECRET;
       if (!secretKey) {
         return {
-          statusCode: StatusCodes.BAD_REQUEST,
+          statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
           message: `secret key not provided`,
           return: null,
         };
@@ -67,7 +67,7 @@ export class UserService {
         user.password,
         getUser.password,
       );
-      if (!user && !doPasswordsMatch) {
+      if (!user || !doPasswordsMatch) {
         return {
           statusCode: StatusCodes.UNAUTHORIZED,
           message: `incorrect password`,
